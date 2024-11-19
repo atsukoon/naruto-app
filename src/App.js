@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import './App.css';
 import axios from 'axios';
+import Header from './Header';
+import Card from './Card';
+import Footer from './Footer';
 
 function App() {
   const [characters, setCharacters] = useState([]);
@@ -15,7 +18,9 @@ function App() {
   const fetchCharacters = async (page) => {
     const apiUrl = 'https://narutodb.xyz/api/character';
     setIsLoading(true);
-    const result = await axios.get(apiUrl, { params: { page: page, limit: limit} });
+    const result = await axios.get(apiUrl, {
+      params: { page: page, limit: limit },
+    });
     setCharacters(result.data.characters);
     setIsLoading(false);
   };
@@ -34,52 +39,23 @@ function App() {
 
   return (
     <div className="container">
-      <div className='header'>
-        <div className='header-content'>
-          <img className='logo' src='logo.png' alt='logo'/>
-        </div>
-      </div>
+      <Header />
       {isLoading ? (
         'Now Loading...'
       ) : (
         <main>
           <div className="cards-container">
             {characters.map((character) => {
-              return (
-                <div className="card" key={character.id}>
-                  <img
-                    src={
-                      character.images[0] != null
-                        ? character.images[0]
-                        : 'dummy.png'
-                    }
-                    className="card-image"
-                    alt="character image"
-                  />
-                  <div className="card-content">
-                    <h3 className="card-title">{character.name}</h3>
-                    <p className="card-description">
-                      {character.debut?.appearsIn ?? 'なし'}
-                    </p>
-                    <div className="card-footer">
-                      <span className="affiliation">
-                        {character.personal?.affiliation ?? 'なし'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              );
+              return <Card key={character.id} character={character}/>;
             })}
           </div>
-          <div className="pager">
-            <button className="prev" disabled={pageNum === 1} onClick={handlePrev}>
-              Previous
-            </button>
-            <span className="page-number">{pageNum}</span>
-            <button className="next" disabled={limit > characters.length} onClick={handleNext}>
-              Next
-            </button>
-          </div>
+          <Footer
+            page={pageNum}
+            limit={limit}
+            prev={handlePrev}
+            next={handleNext}
+            length={characters.length}
+          />
         </main>
       )}
     </div>
